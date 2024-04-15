@@ -25,5 +25,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'addTask') {
+    // Controleer of alle vereiste parameters zijn ontvangen
+    if (isset($_POST['user_id']) && isset($_POST['task']) && isset($_POST['startdate']) && isset($_POST['enddate'])) {
+        $user_id = $_POST['user_id'];
+        $task = $_POST['task'];
+        $startdate = $_POST['startdate'];
+        $enddate = $_POST['enddate'];
+        
+        if (strtotime($startdate) === false || strtotime($enddate) === false) {
+            echo json_encode(array('message' => 'Ongeldige datum. Gebruik het formaat YYYY-MM-DD.'));
+        } else {
+            $sql = "INSERT INTO todos (user_id, task, startdate, enddate, done) VALUES ('$user_id', '$task', '$startdate', '$enddate', FALSE)";
+            if ($conn->query($sql) === TRUE) {
+                echo json_encode(array('message' => 'Taak succesvol toegevoegd'));
+            } else {
+                echo json_encode(array('message' => 'Er is een fout opgetreden bij het toevoegen van de taak'));
+            }
+        }
+    } else {
+        echo json_encode(array('message' => 'Niet alle vereiste parameters zijn ontvangen'));
+    }
+}
+
 $conn->close();
 ?>
