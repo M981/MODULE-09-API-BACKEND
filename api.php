@@ -9,5 +9,21 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-echo "Connected successfully";
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getTasks') {
+    $sql = "SELECT * FROM todos";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $tasks = array();
+        while ($row = $result->fetch_assoc()) {
+            $tasks[] = $row;
+        }
+        header('Content-Type: application/json');
+        echo json_encode($tasks);
+    } else {
+        echo json_encode(array('message' => 'Geen taken gevonden'));
+    }
+}
+
+$conn->close();
 ?>
