@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: PUT");
+header("Access-Control-Allow-Headers: Content-Type");
 $servername = "localhost"; 
 $username = "root"; 
 $password = ""; 
@@ -45,6 +48,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     } else {
         echo json_encode(array('message' => 'Niet alle vereiste parameters zijn ontvangen'));
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'PUT' && isset($_GET['action']) && $_GET['action'] === 'updateTask') {
+    // Controleer of alle vereiste parameters zijn ontvangen
+    parse_str(file_get_contents("php://input"), $put_vars);
+    if (isset($put_vars['id'])) {
+        $task_id = $put_vars['id'];
+        
+        $sql = "UPDATE todos SET done = TRUE WHERE id = '$task_id'";
+        if ($conn->query($sql) === TRUE) {
+            echo json_encode(array('message' => 'Taak succesvol gemarkeerd als voltooid'));
+        } else {
+            echo json_encode(array('message' => 'Er is een fout opgetreden bij het bijwerken van de taak'));
+        }
+    } else {
+        echo json_encode(array('message' => 'Taak-ID is niet ontvangen'));
     }
 }
 
